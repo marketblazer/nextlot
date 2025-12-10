@@ -8,6 +8,8 @@ async function run() {
   const port = typeof addr === 'object' && addr ? addr.port : 0
   const base = `http://127.0.0.1:${port}`
 
+  const siteId = process.argv[2] || 'test'
+  const auctionId = process.argv[3] || 'testAuction'
   const authHeaders = { Authorization: 'Bearer nextlot', accept: 'application/json' }
 
   const results: any[] = []
@@ -25,12 +27,14 @@ async function run() {
   }
 
   await call('/health')
-  await call('/sites/test/info', { headers: authHeaders })
-  await call('/sites/test/auctions', { headers: authHeaders })
-  await call('/sites/test/auctions/testAuction/lots', { headers: authHeaders })
+  await call(`/sites/${siteId}/info`, { headers: authHeaders })
+  await call(`/sites/${siteId}/auctions`, { headers: authHeaders })
+  await call(`/sites/${siteId}/auctions/${auctionId}/lots`, { headers: authHeaders })
+  await call(`/proxy/sites/${siteId}/info`, { headers: authHeaders })
+  await call(`/proxy/sites/${siteId}/auctions`, { headers: authHeaders })
 
   server.close()
-  console.log(JSON.stringify({ base, results }, null, 2))
+  console.log(JSON.stringify({ base, siteId, auctionId, results }, null, 2))
 }
 
 run().catch(err => {
