@@ -20,7 +20,7 @@ export function createApp() {
 
   app.use(proxyInterceptor());
 
-  app.use('/api', apiRouter);
+  app.use('/', apiRouter);
 
   app.get('/', (_req: Request, res: Response) => {
     res.json({ ok: true, service: 'nextlot-api', timestamp: new Date().toISOString() });

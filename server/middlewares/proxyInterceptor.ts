@@ -12,20 +12,19 @@ export function proxyInterceptor(): RequestHandler {
 
   const pathFilter = (path: string) => path.startsWith('/proxy/');
 
-  return createProxyMiddleware(pathFilter, {
-    target,
-    changeOrigin: true,
-    pathRewrite: { '^/proxy': '' },
-    logLevel: 'warn',
-    onProxyReq: (proxyReq, req, _res) => {
-      // Example interceptor: add correlation header
-      proxyReq.setHeader('x-forwarded-by', 'nextlot-server');
-      // Attach auth token if present
-      const token = req.headers['authorization'];
-      if (token) proxyReq.setHeader('authorization', token as string);
-    },
-    onProxyRes: (_proxyRes, _req, _res) => {
-      // You can inspect/transform responses here if needed
-    },
-  });
+  try {
+    return createProxyMiddleware(pathFilter, {
+      target,
+      changeOrigin: true,
+      pathRewrite: { '^/proxy': '' },
+      logLevel: 'warn',
+      onProxyReq: (proxyReq, req, _res) => {
+        proxyReq.setHeader('x-forwarded-by', 'nextlot-server');
+        const token = req.headers['authorization'];
+        if (token) proxyReq.setHeader('authorization', token as string);
+      },
+    });
+  } catch {
+    return (req, _res, next) => next();
+  }
 }
