@@ -1,0 +1,62 @@
+{
+  "info": {
+    "name": "Nextlot Vercel Endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "vercelBase", "value": "https://nextlotendpoints.vercel.app" },
+    { "key": "siteId", "value": "YOUR_SITE_ID" },
+    { "key": "auctionId", "value": "YOUR_AUCTION_ID" },
+    { "key": "token", "value": "Bearer YOUR_TOKEN" }
+  ],
+  "item": [
+    {
+      "name": "Root",
+      "request": { "method": "GET", "url": "{{vercelBase}}/api/" }
+    },
+    {
+      "name": "Health",
+      "request": { "method": "GET", "url": "{{vercelBase}}/api/api/health" }
+    },
+    {
+      "name": "Proxy: Site Info",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "{{token}}" }],
+        "url": "{{vercelBase}}/api/proxy/sites/{{siteId}}/info"
+      }
+    },
+    {
+      "name": "Proxy: Auctions List",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "{{token}}" }],
+        "url": "{{vercelBase}}/api/proxy/sites/{{siteId}}/auctions"
+      }
+    },
+    {
+      "name": "Proxy: Lots List",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "{{token}}" }],
+        "url": "{{vercelBase}}/api/proxy/sites/{{siteId}}/auctions/{{auctionId}}/lots"
+      }
+    },
+    {
+      "name": "API: Auctions List (controllers)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "{{token}}" }],
+        "url": "{{vercelBase}}/api/api/sites/{{siteId}}/auctions"
+      }
+    },
+    {
+      "name": "API: Lots List (controllers)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "{{token}}" }],
+        "url": "{{vercelBase}}/api/api/sites/{{siteId}}/auctions/{{auctionId}}/lots"
+      }
+    }
+  ]
+}

@@ -1,14 +1,21 @@
 import { Request, Response } from 'express';
 
-// Placeholder controller for site info until base URL is provided
 export async function info(req: Request, res: Response) {
   const siteId = req.params.site_id || req.params.siteId;
   const base = process.env.NEXTLOT_BASE_URL || 'https://enter-base-url-here';
   const targetUrl = `${base}/sites/${siteId}/info`;
 
-  return res.json({
-    site_id: siteId,
-    targetUrl,
-    message: 'Placeholder response. Set NEXTLOT_BASE_URL to enable real integration.',
-  });
+  const headers: Record<string, string> = {
+    accept: 'application/json',
+  };
+  const auth = req.headers['authorization'];
+  if (auth) headers['authorization'] = String(auth);
+
+  try {
+    const resp = await fetch(targetUrl, { headers });
+    const data = await resp.json().catch(() => ({}));
+    return res.status(resp.status).json(data);
+  } catch (err: any) {
+    return res.status(502).json({ error: 'Bad Gateway', detail: String(err) });
+  }
 }

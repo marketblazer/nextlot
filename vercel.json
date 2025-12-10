@@ -9,6 +9,7 @@
     "CORS_ORIGIN": "*",
     "MARKETPLACE_SIGNING_SECRET": "replace-in-vercel",
     "NEXTLOT_SERVER_TOKEN": "nextlot",
-    "NEXTLOT_BASE_URL": "https://enter-base-url-here"
+    "NEXTLOT_BASE_URL": "https://api-backend.nextlot-beta.com/api/backend/v1",
+    "PROXY_TARGET": "https://api-backend.nextlot-beta.com/api/backend/v1"
   }
 }

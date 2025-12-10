@@ -6,11 +6,15 @@ export async function list(req: Request, res: Response) {
   const base = process.env.NEXTLOT_BASE_URL || 'https://enter-base-url-here';
   const targetUrl = `${base}/sites/${siteId}/auctions/${auctionId}/lots`;
 
-  return res.json({
-    site_id: siteId,
-    auction_id: auctionId,
-    targetUrl,
-    message: 'Placeholder response for listing lots. Set NEXTLOT_BASE_URL to enable real integration.',
-    lots: [],
-  });
+  const headers: Record<string, string> = { accept: 'application/json' };
+  const auth = req.headers['authorization'];
+  if (auth) headers['authorization'] = String(auth);
+
+  try {
+    const resp = await fetch(targetUrl, { headers });
+    const data = await resp.json().catch(() => ({}));
+    return res.status(resp.status).json(data);
+  } catch (err: any) {
+    return res.status(502).json({ error: 'Bad Gateway', detail: String(err) });
+  }
 }
