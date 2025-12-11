@@ -1,6 +1,7 @@
-export async function GET(req: Request, ctx: { params: { site_id: string; auction_id: string } }) {
+export async function GET(req: Request, context: { params: Promise<{ site_id: string; auction_id: string }> }) {
+  const { site_id, auction_id } = await context.params
   const base = process.env.NEXTLOT_BASE_URL || 'https://enter-base-url-here'
-  const targetUrl = `${base}/sites/${ctx.params.site_id}/auctions/${ctx.params.auction_id}/lots`
+  const targetUrl = `${base}/sites/${site_id}/auctions/${auction_id}/lots`
   const headers: Record<string, string> = { accept: 'application/json' }
   const auth = req.headers.get('authorization')
   if (auth) headers['authorization'] = auth

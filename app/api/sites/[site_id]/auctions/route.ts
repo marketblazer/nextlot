@@ -1,6 +1,7 @@
-export async function GET(req: Request, ctx: { params: { site_id: string } }) {
+export async function GET(req: Request, context: { params: Promise<{ site_id: string }> }) {
+  const { site_id } = await context.params
   const base = process.env.NEXTLOT_BASE_URL || 'https://enter-base-url-here'
-  const targetUrl = `${base}/sites/${ctx.params.site_id}/auctions`
+  const targetUrl = `${base}/sites/${site_id}/auctions`
   const headers: Record<string, string> = { accept: 'application/json' }
   const auth = req.headers.get('authorization')
   if (auth) headers['authorization'] = auth
@@ -14,9 +15,10 @@ export async function GET(req: Request, ctx: { params: { site_id: string } }) {
   }
 }
 
-export async function POST(req: Request, ctx: { params: { site_id: string } }) {
+export async function POST(req: Request, context: { params: Promise<{ site_id: string }> }) {
+  const { site_id } = await context.params
   const base = process.env.NEXTLOT_BASE_URL || 'https://enter-base-url-here'
-  const targetUrl = `${base}/sites/${ctx.params.site_id}/auctions`
+  const targetUrl = `${base}/sites/${site_id}/auctions`
   const headers: Record<string, string> = { accept: 'application/json', 'content-type': 'application/json' }
   const auth = req.headers.get('authorization')
   if (auth) headers['authorization'] = auth

@@ -1,6 +1,7 @@
-export async function GET(req: Request, ctx: { params: { site_id: string } }) {
+export async function GET(req: Request, context: { params: Promise<{ site_id: string }> }) {
+  const { site_id } = await context.params
   const base = process.env.NEXTLOT_BASE_URL || 'https://enter-base-url-here'
-  const targetUrl = `${base}/sites/${ctx.params.site_id}/info`
+  const targetUrl = `${base}/sites/${site_id}/info`
   const headers: Record<string, string> = { accept: 'application/json' }
   const auth = req.headers.get('authorization')
   if (auth) headers['authorization'] = auth
