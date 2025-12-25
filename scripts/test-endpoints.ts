@@ -10,7 +10,7 @@ async function run() {
 
   const siteId = process.argv[2] || 'test'
   const auctionId = process.argv[3] || 'testAuction'
-  const authHeaders = { Authorization: 'Bearer nextlot', accept: 'application/json' }
+  const authHeaders = { 'Nextlot-Server-Token': process.env.NEXTLOT_SERVER_TOKEN || 'nextlot', accept: 'application/json' }
 
   const results: any[] = []
 
