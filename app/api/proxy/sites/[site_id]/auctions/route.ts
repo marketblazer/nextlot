@@ -1,6 +1,6 @@
 export async function GET(req: Request, context: { params: Promise<{ site_id: string }> }) {
   const { site_id } = await context.params
-  const base = process.env.PROXY_TARGET || process.env.NEXTLOT_BASE_URL || 'https://api-backend.nextlot.net/api/backend/v1';
+  const base = process.env.PROXY_TARGET || 'https://api-backend.nextlot.net/api/backend/v1';
   const targetUrl = `${base}/sites/${site_id}/auctions`
   const headers: Record<string, string> = { accept: 'application/json' }
   const token = req.headers.get('Nextlot-Server-Token') || process.env.NEXTLOT_SERVER_TOKEN || ''
@@ -49,7 +49,7 @@ export async function GET(req: Request, context: { params: Promise<{ site_id: st
 
 export async function POST(req: Request, context: { params: Promise<{ site_id: string }> }) {
   const { site_id } = await context.params
-  const base = process.env.PROXY_TARGET || process.env.NEXTLOT_BASE_URL || 'https://api-backend.nextlot.net/api/backend/v1';
+  const base = process.env.PROXY_TARGET || 'https://api-backend.nextlot.net/api/backend/v1';
   const targetUrl = `${base}/sites/${site_id}/auctions`
   const headers: Record<string, string> = { 
     accept: 'application/json', 

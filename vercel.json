@@ -4,7 +4,13 @@
     "CORS_ORIGIN": "*",
     "MARKETPLACE_SIGNING_SECRET": "replace-in-vercel",
     "NEXTLOT_SERVER_TOKEN": "nextlot",
-    "NEXTLOT_BASE_URL": "https://api-backend.nextlot-beta.com/api/backend/v1",
-    "PROXY_TARGET": "https://api-backend.nextlot-beta.com/api/backend/v1"
-  }
+    "NEXTLOT_BASE_URL": "https://marketblazer-nextlot.vercel.app/",
+    "PROXY_TARGET": "https://api-backend.nextlot.net/api/backend/v1"
+  },
+  "rewrites": [
+    {
+      "source": "/api/backend/v1/:path*",
+      "destination": "https://api-backend.nextlot.net/api/backend/v1/:path*"
+    }
+  ]
 }

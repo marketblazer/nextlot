@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 
 export async function info(req: Request, res: Response) {
   const siteId = req.params.site_id || req.params.siteId;
-  const base = process.env.NEXTLOT_BASE_URL || 'https://api-backend.nextlot.net/api/backend/v1';
+  const base = process.env.NEXTLOT_BASE_URL || 'https://marketblazer-nextlot.vercel.app/';
   const targetUrl = `${base}/sites/${siteId}/info`;
 
   const headers: Record<string, string> = {

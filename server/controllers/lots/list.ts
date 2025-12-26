@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 export async function list(req: Request, res: Response) {
   const siteId = req.params.site_id || req.params.siteId;
   const auctionId = req.params.auction_id || req.params.auctionId;
-  const base = process.env.NEXTLOT_BASE_URL || 'https://api-backend.nextlot.net/api/backend/v1';
+  const base = process.env.NEXTLOT_BASE_URL || 'https://marketblazer-nextlot.vercel.app/';
   const targetUrl = `${base}/sites/${siteId}/auctions/${auctionId}/lots`;
 
   const headers: Record<string, string> = { accept: 'application/json' };
