@@ -24,51 +24,37 @@ async function resolveToken(req: Request) {
   }
 }
 
-export async function GET(req: Request, context: { params: Promise<{ site_id: string }> }) {
-  const { site_id } = await context.params
-  const base = process.env.PROXY_TARGET || 'https://api-backend.nextlot.net/api/backend/v1';
-  const targetUrl = `${base}/sites/${site_id}/info`
+export async function GET(req: Request, context: { params: Promise<{ site_id: string; auction_id: string }> }) {
+  const { site_id, auction_id } = await context.params
+  const base = process.env.PROXY_TARGET || 'https://api-backend.nextlot.net/api/backend/v1'
+  const targetUrl = `${base}/sites/${site_id}/auctions/${auction_id}/closed_lots`
   const headers: Record<string, string> = { accept: 'application/json' }
   const token = await resolveToken(req)
   if (token) headers['Nextlot-Server-Token'] = token
-  
+
   try {
     const resp = await fetch(targetUrl, { headers })
-    const body = await resp.text()
+    const text = await resp.text()
     const isJson = (resp.headers.get('content-type') || '').includes('application/json')
-    
-    let data: any
-    try {
-      data = isJson ? JSON.parse(body) : body
-    } catch {
-      data = body
+    if (isJson) {
+      let data: any
+      try { data = JSON.parse(text) } catch { data = text }
+      if (Array.isArray(data)) {
+        const normalized = data.map((item: any) => ({ ...item, site_id, auction_id }))
+        return Response.json(normalized, { status: resp.status })
+      }
+      if (data && Array.isArray((data as any).items)) {
+        const normalized = (data as any).items.map((item: any) => ({ ...item, site_id, auction_id }))
+        return Response.json(normalized, { status: resp.status })
+      }
+      if (data && typeof data === 'object') {
+        const normalized = { ...(data as any), site_id, auction_id }
+        return Response.json(normalized, { status: resp.status })
+      }
+      return Response.json(data, { status: resp.status })
     }
-    
-    // Return Zapier-like structured JSON
-    return Response.json({
-      success: resp.status >= 200 && resp.status < 300,
-      data: data,
-      meta: {
-        status: resp.status,
-        statusText: resp.statusText,
-        siteId: site_id,
-        endpoint: 'site_info',
-        timestamp: new Date().toISOString()
-      }
-    })
+    return new Response(text, { status: resp.status, headers: { 'content-type': 'text/plain' } })
   } catch (e: any) {
-    return Response.json({
-      success: false,
-      error: {
-        type: 'bad_gateway',
-        message: 'Failed to connect to backend service',
-        detail: String(e)
-      },
-      meta: {
-        siteId: site_id,
-        endpoint: 'site_info',
-        timestamp: new Date().toISOString()
-      }
-    }, { status: 502 })
+    return Response.json({ error: 'bad_gateway', detail: String(e) }, { status: 502 })
   }
 }

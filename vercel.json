@@ -5,7 +5,9 @@
     "MARKETPLACE_SIGNING_SECRET": "replace-in-vercel",
     "NEXTLOT_SERVER_TOKEN": "nextlot",
     "NEXTLOT_BASE_URL": "https://marketblazer-nextlot.vercel.app/",
-    "PROXY_TARGET": "https://api-backend.nextlot.net/api/backend/v1"
+    "PROXY_TARGET": "https://api-backend.nextlot.net/api/backend/v1",
+    "GHL_TOKEN_RESOLVER_URL": "replace-in-vercel",
+    "GHL_SERVICE_API_KEY": "replace-in-vercel"
   },
   "rewrites": [
     {
