@@ -24,10 +24,10 @@ async function resolveToken(req: Request) {
   }
 }
 
-export async function GET(req: Request, context: { params: Promise<{ site_id: string; auction_id: string }> }) {
-  const { site_id, auction_id } = await context.params
+export async function GET(req: Request, context: { params: Promise<{ site_id: string; bidder_uniq_identifier: string }> }) {
+  const { site_id, bidder_uniq_identifier } = await context.params
   const base = process.env.PROXY_TARGET || 'https://api-backend.nextlot.net/api/backend/v1'
-  const targetUrl = `${base}/sites/${site_id}/auctions/${auction_id}/lots`
+  const targetUrl = `${base}/sites/${site_id}/bidders/${bidder_uniq_identifier}`
   const headers: Record<string, string> = { accept: 'application/json' }
   const token = await resolveToken(req)
   if (token) headers['Nextlot-Server-Token'] = token
@@ -40,15 +40,15 @@ export async function GET(req: Request, context: { params: Promise<{ site_id: st
       let data: any
       try { data = JSON.parse(text) } catch { data = text }
       if (Array.isArray(data)) {
-        const normalized = data.map((item: any) => ({ ...item, site_id, auction_id }))
+        const normalized = data.map((item: any) => ({ ...item, site_id, bidder_uniq_identifier }))
         return Response.json(normalized, { status: resp.status })
       }
       if (data && Array.isArray((data as any).items)) {
-        const normalized = (data as any).items.map((item: any) => ({ ...item, site_id, auction_id }))
+        const normalized = (data as any).items.map((item: any) => ({ ...item, site_id, bidder_uniq_identifier }))
         return Response.json(normalized, { status: resp.status })
       }
       if (data && typeof data === 'object') {
-        const normalized = { ...(data as any), site_id, auction_id }
+        const normalized = { ...(data as any), site_id, bidder_uniq_identifier }
         return Response.json(normalized, { status: resp.status })
       }
       return Response.json(data, { status: resp.status })
@@ -59,17 +59,17 @@ export async function GET(req: Request, context: { params: Promise<{ site_id: st
   }
 }
 
-export async function POST(req: Request, context: { params: Promise<{ site_id: string; auction_id: string }> }) {
-  const { site_id, auction_id } = await context.params
+export async function PUT(req: Request, context: { params: Promise<{ site_id: string; bidder_uniq_identifier: string }> }) {
+  const { site_id, bidder_uniq_identifier } = await context.params
   const base = process.env.PROXY_TARGET || 'https://api-backend.nextlot.net/api/backend/v1'
-  const targetUrl = `${base}/sites/${site_id}/auctions/${auction_id}/lots`
+  const targetUrl = `${base}/sites/${site_id}/bidders/${bidder_uniq_identifier}`
   const headers: Record<string, string> = { accept: 'application/json', 'content-type': 'application/json' }
   const token = await resolveToken(req)
   if (token) headers['Nextlot-Server-Token'] = token
   const body = await req.text()
 
   try {
-    const resp = await fetch(targetUrl, { method: 'POST', headers, body })
+    const resp = await fetch(targetUrl, { method: 'PUT', headers, body })
     const text = await resp.text()
     const isJson = (resp.headers.get('content-type') || '').includes('application/json')
     let data: any
@@ -81,8 +81,8 @@ export async function POST(req: Request, context: { params: Promise<{ site_id: s
         status: resp.status,
         statusText: resp.statusText,
         siteId: site_id,
-        auctionId: auction_id,
-        endpoint: 'lots_create',
+        bidderUniqIdentifier: bidder_uniq_identifier,
+        endpoint: 'bidder_update',
         timestamp: new Date().toISOString()
       }
     })
@@ -96,8 +96,8 @@ export async function POST(req: Request, context: { params: Promise<{ site_id: s
       },
       meta: {
         siteId: site_id,
-        auctionId: auction_id,
-        endpoint: 'lots_create',
+        bidderUniqIdentifier: bidder_uniq_identifier,
+        endpoint: 'bidder_update',
         timestamp: new Date().toISOString()
       }
     }, { status: 502 })

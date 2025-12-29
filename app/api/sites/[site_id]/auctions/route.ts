@@ -34,67 +34,48 @@ export async function GET(req: Request, context: { params: Promise<{ site_id: st
   
   try {
     const resp = await fetch(targetUrl, { headers })
-    const body = await resp.text()
+    const text = await resp.text()
     const isJson = (resp.headers.get('content-type') || '').includes('application/json')
-    
-    let data: any
-    try {
-      data = isJson ? JSON.parse(body) : body
-    } catch {
-      data = body
+    if (isJson) {
+      let data: any
+      try { data = JSON.parse(text) } catch { data = text }
+      if (Array.isArray(data)) {
+        const normalized = data.map((item: any) => ({ ...item, site_id }))
+        return Response.json(normalized, { status: resp.status })
+      }
+      if (data && Array.isArray((data as any).items)) {
+        const normalized = (data as any).items.map((item: any) => ({ ...item, site_id }))
+        return Response.json(normalized, { status: resp.status })
+      }
+      if (data && typeof data === 'object') {
+        const normalized = { ...(data as any), site_id }
+        return Response.json(normalized, { status: resp.status })
+      }
+      return Response.json(data, { status: resp.status })
     }
-    
-    // Return Zapier-like structured JSON
-    return Response.json({
-      success: resp.status >= 200 && resp.status < 300,
-      data: data,
-      meta: {
-        status: resp.status,
-        statusText: resp.statusText,
-        siteId: site_id,
-        endpoint: 'auctions_list',
-        timestamp: new Date().toISOString()
-      }
-    })
+    return new Response(text, { status: resp.status, headers: { 'content-type': 'text/plain' } })
   } catch (e: any) {
-    return Response.json({
-      success: false,
-      error: {
-        type: 'bad_gateway',
-        message: 'Failed to connect to backend service',
-        detail: String(e)
-      },
-      meta: {
-        siteId: site_id,
-        endpoint: 'auctions_list',
-        timestamp: new Date().toISOString()
-      }
-    }, { status: 502 })
+    return Response.json({ error: 'bad_gateway', detail: String(e) }, { status: 502 })
   }
 }
 
-export async function POST(req: Request, context: { params: Promise<{ site_id: string }> }) {
+export async function PUT(req: Request, context: { params: Promise<{ site_id: string }> }) {
   const { site_id } = await context.params
-  const base = process.env.PROXY_TARGET || 'https://api-backend.nextlot.net/api/backend/v1';
+  const base = process.env.PROXY_TARGET || 'https://api-backend.nextlot.net/api/backend/v1'
   const targetUrl = `${base}/sites/${site_id}/auctions`
   const headers: Record<string, string> = { accept: 'application/json', 'content-type': 'application/json' }
   const token = await resolveToken(req)
   if (token) headers['Nextlot-Server-Token'] = token
   const body = await req.text()
-  
+
   try {
-    const resp = await fetch(targetUrl, { method: 'POST', headers, body })
+    const resp = await fetch(targetUrl, { method: 'PUT', headers, body })
     const text = await resp.text()
     const isJson = (resp.headers.get('content-type') || '').includes('application/json')
-    
+
     let data: any
-    try {
-      data = isJson ? JSON.parse(text) : text
-    } catch {
-      data = text
-    }
-    
-    // Return Zapier-like structured JSON
+    try { data = isJson ? JSON.parse(text) : text } catch { data = text }
+
     return Response.json({
       success: resp.status >= 200 && resp.status < 300,
       data: data,
@@ -102,7 +83,7 @@ export async function POST(req: Request, context: { params: Promise<{ site_id: s
         status: resp.status,
         statusText: resp.statusText,
         siteId: site_id,
-        endpoint: 'auctions_create',
+        endpoint: 'auctions_update',
         timestamp: new Date().toISOString()
       }
     })
@@ -116,7 +97,7 @@ export async function POST(req: Request, context: { params: Promise<{ site_id: s
       },
       meta: {
         siteId: site_id,
-        endpoint: 'auctions_create',
+        endpoint: 'auctions_update',
         timestamp: new Date().toISOString()
       }
     }, { status: 502 })
